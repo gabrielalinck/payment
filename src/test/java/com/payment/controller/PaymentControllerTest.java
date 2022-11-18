@@ -33,20 +33,19 @@ class PaymentControllerTest {
         return paymentService.getPayment(userId, accountId, paymentRequest);
     }*/
 
-    @Test
-    void shouldCreateAPayment() {
-        Integer userId = 1;
-        Integer accountId = 1;
-        PaymentRequest paymentRequest = new PaymentRequest();
-        List<Product> products = new ArrayList<Product>() {};
-        Product product1 = getProduct();
-        products.add(product1);
-        paymentRequest.setProducts(products);
-        String actual = controller.createPayment(userId, accountId, paymentRequest);
-        assert actual.isEmpty();
-        //String expected = ;
-        //assertEquals(actual, expected);
-    }
+//    @Test
+//    void shouldCreateAPayment() {
+//        Integer userId = 1;
+//        Integer accountId = 1;
+//        PaymentRequest paymentRequest = new PaymentRequest();
+//        List<Product> products = new ArrayList<Product>() {};
+//        Product product1 = getProduct();
+//        products.add(product1);
+//        paymentRequest.setProducts(products);
+//        String actual = controller.createPayment(userId, accountId, paymentRequest);
+//        assert actual.isEmpty();
+//
+//    }
 
     private static Product getProduct() {
         Product product1 = new Product();

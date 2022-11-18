@@ -3,6 +3,7 @@ package com.payment.controller;
 import java.util.Base64;
 import java.util.List;
 
+import com.payment.exceptions.PaymentException;
 import com.payment.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,14 +45,18 @@ public class PaymentController {
 	}
 	
 	@PostMapping("/{userId}/{accountId}")
-	public String createPayment(@PathVariable Integer userId,@PathVariable Integer accountId, @RequestBody PaymentRequest paymentRequest) {
+	public String createPayment(
+			@PathVariable Integer userId,
+			@PathVariable Integer accountId,
+			@RequestBody PaymentRequest paymentRequest
+	) throws PaymentException {
 		Integer paymentId = paymentService.createPayment(userId, accountId, paymentRequest);
 		byte[] paymentInBytes = String.valueOf(paymentId).getBytes();
 		return getPaymentString(paymentInBytes);
 	}
 
 	@PostMapping("/{paymentHash}")
-	public Payment confirmPayment(@PathVariable String paymentHash) {
+	public Payment confirmPayment(@PathVariable String paymentHash) throws Exception {
 		return paymentService.confirmPayment(paymentHash);
 	}
 

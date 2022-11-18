@@ -1,6 +1,7 @@
 package com.payment.dao;
 
 import com.payment.entity.Payment;
+import com.payment.exceptions.PaymentException;
 import com.payment.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -14,8 +15,9 @@ public class PaymentDAO {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    public Payment getPaymentByID(String decoded) {
-        return paymentRepository.findById(Integer.parseInt(decoded)).orElseThrow(() -> new RuntimeException());
+    public Payment getPaymentByID(String decoded) throws PaymentException {
+        return paymentRepository.findById(Integer.parseInt(decoded))
+                .orElseThrow(() -> new PaymentException("Couldn't find a payment with this ID"));
     }
 
     public Payment savePayment(Payment payment) {
