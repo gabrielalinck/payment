@@ -1,9 +1,7 @@
 package com.payment.service;
 
 import com.payment.controller.reques.PaymentRequest;
-import com.payment.dao.AccountDAO;
 import com.payment.dao.PaymentDAO;
-import com.payment.dao.ProductDAO;
 import com.payment.entity.Account;
 import com.payment.entity.Payment;
 import com.payment.entity.Product;
@@ -26,7 +24,7 @@ public class PaymentService {
     private UserService userService;
 
     @Autowired
-    private ProductDAO productDAO;
+    private ProductService productService;
 
     @Autowired
     private AccountService accountService;
@@ -80,12 +78,22 @@ public class PaymentService {
         }
     }
 
-    private List<Product> generateListOfProducts(PaymentRequest paymentRequest) {
-        List<Product> products = paymentRequest
-                .getProducts()
-                .stream()
-                .map(p -> productDAO.getProduct(p))
-                .collect(Collectors.toList());
-        return products;
+    private List<Product> generateListOfProducts(PaymentRequest paymentRequest) throws PaymentException {
+        try {
+            List<Product> products = paymentRequest
+                    .getProducts()
+                    .stream()
+                    .map(p -> {
+                        try {
+                            return productService.getProductById(p.getId());
+                        } catch (Exception exception) {
+                            throw new RuntimeException(exception);
+                        }
+                    })
+                    .collect(Collectors.toList());
+            return products;
+        } catch (Exception exception) {
+            throw new PaymentException("Product not found");
+        }
     }
 }

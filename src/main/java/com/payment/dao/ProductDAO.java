@@ -1,6 +1,7 @@
 package com.payment.dao;
 
 import com.payment.entity.Product;
+import com.payment.exceptions.ProductException;
 import com.payment.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,7 +14,7 @@ public class ProductDAO {
     @Autowired
     private ProductRepository productRepository;
 
-    public Product getProduct(Product p) {
-        return productRepository.findById(p.getId()).orElseThrow(() -> new RuntimeException());
+    public Product getProduct(Integer productID) throws ProductException {
+        return productRepository.findById(productID).orElseThrow(() -> new ProductException("Product not found"));
     }
 }
