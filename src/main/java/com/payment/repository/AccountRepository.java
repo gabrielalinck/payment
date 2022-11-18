@@ -4,8 +4,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.payment.entity.Account;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional
 public interface AccountRepository extends CrudRepository<Account, Integer>{
 
 }

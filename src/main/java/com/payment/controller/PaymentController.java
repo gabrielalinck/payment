@@ -1,5 +1,6 @@
 package com.payment.controller;
 
+import java.util.Base64;
 import java.util.List;
 
 import com.payment.service.PaymentService;
@@ -44,14 +45,22 @@ public class PaymentController {
 	
 	@PostMapping("/{userId}/{accountId}")
 	public String createPayment(@PathVariable Integer userId,@PathVariable Integer accountId, @RequestBody PaymentRequest paymentRequest) {
-		return paymentService.buildPayment(userId, accountId, paymentRequest);
+		Integer paymentId = paymentService.createPayment(userId, accountId, paymentRequest);
+		byte[] paymentInBytes = String.valueOf(paymentId).getBytes();
+		return getPaymentString(paymentInBytes);
 	}
 
 	@PostMapping("/{paymentHash}")
 	public Payment confirmPayment(@PathVariable String paymentHash) {
-		return paymentService.buildPayment(paymentHash);
+		return paymentService.confirmPayment(paymentHash);
 	}
 
+	private static String getPaymentString(byte[] paymentInBytes) {
+		return new StringBuilder("http://localhost:8080/")
+				.append("api/v1/payments/")
+				.append(Base64.getEncoder().encodeToString(paymentInBytes))
+				.toString();
+	}
 
 
 }

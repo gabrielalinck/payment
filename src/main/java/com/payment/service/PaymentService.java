@@ -9,12 +9,9 @@ import com.payment.entity.Account;
 import com.payment.entity.Payment;
 import com.payment.entity.Product;
 import com.payment.entity.User;
-import com.payment.repository.AccountRepository;
-import com.payment.repository.PaymentRepository;
-import com.payment.repository.ProductRepository;
-import com.payment.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Base64;
@@ -22,10 +19,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class PaymentService {
 
     @Autowired
-    private UserDAO userAccessDAO;
+    private UserDAO userDAO;
 
     @Autowired
     private ProductDAO productDAO;
@@ -36,14 +34,20 @@ public class PaymentService {
     @Autowired
     private PaymentDAO paymentDAO;
 
-    public String buildPayment(Integer userId, Integer accountId, PaymentRequest paymentRequest) {
-        User user = userAccessDAO.getUserByID(userId);
+    public Integer createPayment(Integer userId, Integer accountId, PaymentRequest paymentRequest) {
+        User user = userDAO.getUserByID(userId);
         Account account = accountDAO.getAccount(accountId);
-        List<Product> products = getProducts(paymentRequest);
+        List<Product> products = generateListOfProducts(paymentRequest);
         BigDecimal totalPrice = getTotalPrice(products);
-        Payment payment = buildPayment(user, account, products, totalPrice);
-        byte[] paymentInBytes = String.valueOf(payment.getId()).getBytes();
-        return getPaymentString(paymentInBytes);
+        Payment payment = savePayment(user, account, products, totalPrice);
+        return payment.getId();
+    }
+
+    public Payment confirmPayment(String paymentHash) {
+        String decoded = new String(Base64.getDecoder().decode(paymentHash));
+        Payment payment = paymentDAO.getPaymentByID(decoded);
+        payment.setConfirmed(true);
+        return payment;
     }
 
     private static BigDecimal getTotalPrice(List<Product> products) {
@@ -54,7 +58,7 @@ public class PaymentService {
         return totalPrice;
     }
 
-    private Payment buildPayment(User user, Account account, List<Product> products, BigDecimal totalPrice) {
+    private Payment savePayment(User user, Account account, List<Product> products, BigDecimal totalPrice) {
         Payment payment = new Payment();
         payment.setUser(user);
         payment.setAccount(account);
@@ -64,26 +68,12 @@ public class PaymentService {
         return payment;
     }
 
-    private static String getPaymentString(byte[] paymentInBytes) {
-        return new StringBuilder("http://localhost:8080/")
-                .append("/api/v1/payments/")
-                .append(Base64.getEncoder().encodeToString(paymentInBytes))
-                .toString();
-    }
-
-    private List<Product> getProducts(PaymentRequest paymentRequest) {
+    private List<Product> generateListOfProducts(PaymentRequest paymentRequest) {
         List<Product> products = paymentRequest
                 .getProducts()
                 .stream()
                 .map(p -> productDAO.getProduct(p))
                 .collect(Collectors.toList());
         return products;
-    }
-
-    public Payment buildPayment(String paymentHash) {
-        String decoded = new String(Base64.getDecoder().decode(paymentHash));
-        Payment payment = paymentDAO.getPaymentByID(decoded);
-        payment.setConfirmed(true);
-        return payment;
     }
 }

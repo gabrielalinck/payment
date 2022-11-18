@@ -3,9 +3,12 @@ package com.payment.dao;
 import com.payment.entity.Payment;
 import com.payment.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
-
+@Repository
+@Transactional
 public class PaymentDAO {
 
     @Autowired
