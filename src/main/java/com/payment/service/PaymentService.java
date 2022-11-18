@@ -4,7 +4,6 @@ import com.payment.controller.reques.PaymentRequest;
 import com.payment.dao.AccountDAO;
 import com.payment.dao.PaymentDAO;
 import com.payment.dao.ProductDAO;
-import com.payment.dao.UserDAO;
 import com.payment.entity.Account;
 import com.payment.entity.Payment;
 import com.payment.entity.Product;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 public class PaymentService {
 
     @Autowired
-    private UserDAO userDAO;
+    private UserService userService;
 
     @Autowired
     private ProductDAO productDAO;
@@ -37,7 +36,7 @@ public class PaymentService {
 
     public Integer createPayment(Integer userId, Integer accountId, PaymentRequest paymentRequest) throws PaymentException{
         try {
-            User user = userDAO.getUserByID(userId);
+            User user = userService.getUserById(userId);
             Account account = accountDAO.getAccount(accountId);
             List<Product> products = generateListOfProducts(paymentRequest);
             BigDecimal totalPrice = getTotalPrice(products);
