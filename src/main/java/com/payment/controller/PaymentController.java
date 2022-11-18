@@ -40,10 +40,10 @@ public class PaymentController {
 	private PaymentService paymentService;
 	
 	@GetMapping
-	public List<Payment> getAll() {
-		return (List<Payment>) paymentRepository.findAll();
+	public List<Payment> getAll() throws Exception {
+		return paymentService.getPayments();
 	}
-	
+
 	@PostMapping("/{userId}/{accountId}")
 	public String createPayment(
 			@PathVariable Integer userId,

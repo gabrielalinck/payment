@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
+import java.util.List;
+
 @Repository
 @Transactional
 public class PaymentDAO {
@@ -22,5 +24,9 @@ public class PaymentDAO {
 
     public Payment savePayment(Payment payment) {
         return paymentRepository.save(payment);
+    }
+
+    public List<Payment> getPayments() {
+        return (List<Payment>) paymentRepository.findAll();
     }
 }

@@ -56,6 +56,11 @@ public class PaymentService {
         }
     }
 
+    public List<Payment> getPayments() throws PaymentException{
+        try { return paymentDAO.getPayments(); }
+        catch (Exception exception) { throw new PaymentException("Couldn't get payments"); }
+    }
+
     private static BigDecimal getTotalPrice(List<Product> products) {
         BigDecimal totalPrice = BigDecimal.ZERO;
         for(Product p : products) {

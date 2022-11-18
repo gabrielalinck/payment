@@ -125,6 +125,24 @@ class PaymentServiceTest {
         }
     }
 
+    @Test
+    void shouldGetAllPayments() throws Exception {
+        List<Payment> payments = new ArrayList<Payment>(){};
+        payments.add(buildEmptyPayment());
+
+        when(paymentService.getPayments()).thenReturn(payments);
+        List<Payment> actual = paymentService.getPayments();
+        assertEquals(payments, actual);
+    }
+    
+    @Test
+    void shouldNotGetAllPayments() throws Exception {
+        String errorMessage = "Could not get all payments";
+        when(paymentService.getPayments()).thenThrow(new PaymentException(errorMessage));
+        try { paymentService.getPayments(); }
+        catch (Exception exception) { assertEquals(errorMessage, exception.getMessage());}
+
+    }
     private Payment buildEmptyPayment() {
         Payment payment = new Payment();
         return payment;
