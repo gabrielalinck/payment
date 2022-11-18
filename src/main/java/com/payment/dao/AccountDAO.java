@@ -1,6 +1,7 @@
 package com.payment.dao;
 
 import com.payment.entity.Account;
+import com.payment.exceptions.AccountException;
 import com.payment.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,8 +14,8 @@ public class AccountDAO {
     @Autowired
     private AccountRepository accountRepository;
 
-    public Account getAccount(Integer accountId) {
-        Account account = accountRepository.findById(accountId).orElseThrow(()-> new RuntimeException());
+    public Account getAccount(Integer accountId) throws AccountException {
+        Account account = accountRepository.findById(accountId).orElseThrow(()-> new AccountException("Account not found"));
         return account;
     }
 }

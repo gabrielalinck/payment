@@ -29,7 +29,7 @@ public class PaymentService {
     private ProductDAO productDAO;
 
     @Autowired
-    private AccountDAO accountDAO;
+    private AccountService accountService;
 
     @Autowired
     private PaymentDAO paymentDAO;
@@ -37,7 +37,7 @@ public class PaymentService {
     public Integer createPayment(Integer userId, Integer accountId, PaymentRequest paymentRequest) throws PaymentException{
         try {
             User user = userService.getUserById(userId);
-            Account account = accountDAO.getAccount(accountId);
+            Account account = accountService.getAccountById(accountId);
             List<Product> products = generateListOfProducts(paymentRequest);
             BigDecimal totalPrice = getTotalPrice(products);
             Payment payment = savePayment(user, account, products, totalPrice);

@@ -1,7 +1,10 @@
+
+
 package com.payment.service;
 
 import com.payment.entity.User;
 
+import com.payment.exceptions.UserException;
 import org.junit.jupiter.api.Test;
 
 
@@ -11,16 +14,27 @@ import static org.mockito.Mockito.when;
 
 class UserServiceTest {
 
+    public static final int USER_ID = 1;
     private UserService userService = mock(UserService.class);
 
     @Test
-    void shouldGetUserByID() {
-        int userID = 1;
-        var user = buildUser(userID);
-        when(userService.getUserById(userID)).thenReturn(user);
-        var actual = userService.getUserById(userID);
+    void shouldGetUserByID() throws Exception {
+        var user = buildUser(USER_ID);
+        when(userService.getUserById(USER_ID)).thenReturn(user);
+        var actual = userService.getUserById(USER_ID);
 
         assertEquals(user, actual);
+    }
+
+    @Test
+    void shouldThrowException() throws Exception {
+        String errorMessage = "Account not found";
+        when(userService.getUserById(USER_ID)).thenThrow(new UserException(errorMessage));
+        try { userService.getUserById(USER_ID); }
+        catch (Exception exception) {
+            assertEquals(errorMessage, exception.getMessage());
+        }
+
     }
 
     private User buildUser(Integer userId) {
