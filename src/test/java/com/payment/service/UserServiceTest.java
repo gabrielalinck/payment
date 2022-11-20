@@ -3,10 +3,8 @@
 package com.payment.service;
 
 import com.payment.entity.User;
-
 import com.payment.exceptions.UserException;
 import org.junit.jupiter.api.Test;
-
 
 import java.util.ArrayList;
 import java.util.List;

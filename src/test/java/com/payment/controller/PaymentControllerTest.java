@@ -29,12 +29,12 @@ class PaymentControllerTest {
     public static final int PAYMENT_ID = 1;
     public static final int WRONG_PRODUCT_ID = 1000000000;
     public static final String PRODUCT_NOT_FOUND = "Product not found";
-    public static final String USER_NOT_FOUND = "User not found";
-    public static final String ACCOUNT_NOT_FOUND = "Account not found";
+
     public static final int USER_ID = 1;
     public static final int ACCOUNT_ID = 1;
-    public static final String COULDN_T_FIND_A_PAYMENT_WITH_THIS_ID = "Couldn't find a payment with this ID";
+    public static final String COULDNT_FIND_A_PAYMENT_WITH_THIS_ID = "Couldn't find a payment with this ID";
     public static final int WRONG_PAYMENT_ID = 1000000000;
+    public static final String PAYMENT_COULDNT_BE_SAVED = "Payment couldn't be saved";
     @Autowired
     private PaymentController controller;
 
@@ -93,7 +93,7 @@ class PaymentControllerTest {
         PaymentRequest paymentRequest = getPaymentRequest(PRODUCT1_ID);
 
         try { controller.createPayment(userId, accountId, paymentRequest); }
-        catch (PaymentException exception) { assertEquals(USER_NOT_FOUND, exception.getMessage()); }
+        catch (PaymentException exception) { assertEquals(PAYMENT_COULDNT_BE_SAVED, exception.getMessage()); }
     }
 
     @Test
@@ -103,7 +103,7 @@ class PaymentControllerTest {
         PaymentRequest paymentRequest = getPaymentRequest(PRODUCT1_ID);
 
         try { controller.createPayment(userId, accountId, paymentRequest); }
-        catch (PaymentException exception) { assertEquals(ACCOUNT_NOT_FOUND, exception.getMessage()); }
+        catch (PaymentException exception) { assertEquals(PAYMENT_COULDNT_BE_SAVED, exception.getMessage()); }
     }
 
     @Test
@@ -142,7 +142,7 @@ class PaymentControllerTest {
     void shouldNotConfirmPaymentIfPaymentIsNotDone() throws Exception {
         try { controller.confirmPayment(getPaymentHash(PAYMENT_ID)); }
         catch (PaymentException exception) {
-            assertEquals(COULDN_T_FIND_A_PAYMENT_WITH_THIS_ID, exception.getMessage());
+            assertEquals(COULDNT_FIND_A_PAYMENT_WITH_THIS_ID, exception.getMessage());
         }
 
     }
@@ -153,7 +153,7 @@ class PaymentControllerTest {
         controller.createPayment(USER_ID, ACCOUNT_ID, paymentRequest);
         try { controller.confirmPayment(getPaymentHash(WRONG_PAYMENT_ID)); }
         catch (PaymentException exception) {
-            assertEquals(COULDN_T_FIND_A_PAYMENT_WITH_THIS_ID, exception.getMessage());
+            assertEquals(COULDNT_FIND_A_PAYMENT_WITH_THIS_ID, exception.getMessage());
         }
 
     }

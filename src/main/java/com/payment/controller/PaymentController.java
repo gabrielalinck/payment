@@ -1,24 +1,17 @@
 package com.payment.controller;
 
-import java.util.Base64;
-import java.util.List;
-
-import com.payment.exceptions.PaymentException;
-import com.payment.service.PaymentService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.payment.controller.reques.PaymentRequest;
 import com.payment.entity.Payment;
+import com.payment.exceptions.PaymentException;
 import com.payment.repository.AccountRepository;
 import com.payment.repository.PaymentRepository;
 import com.payment.repository.ProductRepository;
 import com.payment.repository.UserRepository;
+import com.payment.service.PaymentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/payments")
@@ -50,9 +43,7 @@ public class PaymentController {
 			@PathVariable Integer accountId,
 			@RequestBody PaymentRequest paymentRequest
 	) throws PaymentException {
-		Integer paymentId = paymentService.createPayment(userId, accountId, paymentRequest);
-		byte[] paymentInBytes = String.valueOf(paymentId).getBytes();
-		return getPaymentString(paymentInBytes);
+		return paymentService.createPayment(userId, accountId, paymentRequest);
 	}
 
 	@PostMapping("/{paymentHash}")
@@ -60,12 +51,7 @@ public class PaymentController {
 		return paymentService.confirmPayment(paymentHash);
 	}
 
-	private static String getPaymentString(byte[] paymentInBytes) {
-		return new StringBuilder("http://localhost:8080/")
-				.append("api/payments/")
-				.append(Base64.getEncoder().encodeToString(paymentInBytes))
-				.toString();
-	}
+
 
 
 }

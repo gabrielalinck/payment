@@ -7,6 +7,7 @@ import com.payment.entity.Payment;
 import com.payment.entity.Product;
 import com.payment.entity.User;
 import com.payment.exceptions.PaymentException;
+import com.payment.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,14 +33,13 @@ public class PaymentService {
     @Autowired
     private PaymentDAO paymentDAO;
 
-    public Integer createPayment(Integer userId, Integer accountId, PaymentRequest paymentRequest) throws PaymentException{
+    public String createPayment(Integer userId, Integer accountId, PaymentRequest paymentRequest) throws PaymentException{
         try {
-            User user = userService.getUserById(userId);
-            Account account = accountService.getAccountById(accountId);
             List<Product> products = generateListOfProducts(paymentRequest);
             BigDecimal totalPrice = getTotalPrice(products);
-            Payment payment = savePayment(user, account, products, totalPrice);
-            return payment.getId();
+            Payment payment = savePayment(userId, accountId, products, totalPrice);
+            byte[] paymentInBytes = String.valueOf(payment.getId()).getBytes();
+            return getPaymentString(paymentInBytes);
         } catch (Exception exception) {
             throw new PaymentException(exception.getMessage());
         }
@@ -61,6 +61,14 @@ public class PaymentService {
         catch (Exception exception) { throw new PaymentException("Couldn't get payments"); }
     }
 
+    private static String getPaymentString(byte[] paymentInBytes) {
+        String paymentEncoded = Base64.getEncoder().encodeToString(paymentInBytes);
+        return new StringBuilder("http://localhost:8080/")
+                .append("api/payments/")
+                .append(paymentEncoded)
+                .toString();
+    }
+
     private static BigDecimal getTotalPrice(List<Product> products) {
         BigDecimal totalPrice = BigDecimal.ZERO;
         for(Product p : products) {
@@ -69,11 +77,11 @@ public class PaymentService {
         return totalPrice;
     }
 
-    private Payment savePayment(User user, Account account, List<Product> products, BigDecimal totalPrice) throws PaymentException {
+    private Payment savePayment(Integer userId, Integer accountId, List<Product> products, BigDecimal totalPrice) throws PaymentException {
         try {
             Payment payment = new Payment();
-            payment.setUser(user);
-            payment.setAccount(account);
+            payment.setUser(getUser(userId));
+            payment.setAccount(getAccount(accountId));
             payment.setProducts(products);
             payment.setTotalPrice(totalPrice);
             payment = paymentDAO.savePayment(payment);
@@ -83,17 +91,24 @@ public class PaymentService {
         }
     }
 
+    private Account getAccount(Integer accountId) throws Exception {
+        Account account = accountService.getAccountById(accountId);
+        return account;
+    }
+
+    private User getUser(Integer userId) throws UserException {
+        User user = userService.getUserById(userId);
+        return user;
+    }
+
     private List<Product> generateListOfProducts(PaymentRequest paymentRequest) throws PaymentException {
         try {
             List<Product> products = paymentRequest
                     .getProducts()
                     .stream()
                     .map(p -> {
-                        try {
-                            return productService.getProductById(p.getId());
-                        } catch (Exception exception) {
-                            throw new RuntimeException(exception);
-                        }
+                        try { return productService.getProductById(p.getId()); }
+                        catch (Exception exception) { throw new RuntimeException(exception); }
                     })
                     .collect(Collectors.toList());
             return products;

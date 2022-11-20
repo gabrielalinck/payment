@@ -55,13 +55,14 @@ class PaymentServiceTest {
         BigDecimal totalPrice = product1.getPrice();
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setProducts(products);
+        Integer paymentId = buildPaymenyt(products, totalPrice).getId();
+        String paymentHash = getPaymentHash(paymentId);
         when(paymentService.createPayment(USER_ID, ACCOUNT_ID, paymentRequest))
-                .thenReturn(buildPaymenyt(products, totalPrice).getId());
+                .thenReturn(paymentHash);
 
-        Integer actual = paymentService.createPayment(USER_ID, ACCOUNT_ID, paymentRequest);
-        Integer expected = buildPaymenyt(products, totalPrice).getId();
+        String actual = paymentService.createPayment(USER_ID, ACCOUNT_ID, paymentRequest);
 
-        assertEquals(expected, actual);
+        assertEquals(paymentHash, actual);
     }
 
     @Test
@@ -75,13 +76,14 @@ class PaymentServiceTest {
         BigDecimal totalPrice = product1.getPrice().add(product2.getPrice());
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setProducts(products);
+        Integer paymentId = buildPaymenyt(products, totalPrice).getId();
+        String paymentHash = getPaymentHash(paymentId);
         when(paymentService.createPayment(USER_ID, ACCOUNT_ID, paymentRequest))
-                .thenReturn(buildPaymenyt(products, totalPrice).getId());
+                .thenReturn(paymentHash);
 
-        Integer actual = paymentService.createPayment(USER_ID, ACCOUNT_ID, paymentRequest);
-        Integer expected = buildPaymenyt(products, totalPrice).getId();
+        String actual = paymentService.createPayment(USER_ID, ACCOUNT_ID, paymentRequest);
 
-        assertEquals(expected, actual);
+        assertEquals(paymentHash, actual);
     }
 
     @Test
@@ -99,6 +101,7 @@ class PaymentServiceTest {
         Payment payment = paymentService.confirmPayment(paymentHash);
         assertTrue(payment.isConfirmed());
     }
+
     @Test
     void shouldNotConfirmPaymentWhenPaymentIDIsIncorrect() throws Exception{
         byte[] paymentInBytes = String.valueOf(1).getBytes();
@@ -112,7 +115,6 @@ class PaymentServiceTest {
             assertEquals("Couldn't find a payment with this ID", exception.getMessage());
         }
     }
-
     @Test
     void shouldNotSavePayment() throws PaymentException {
         PaymentRequest paymentRequest = new PaymentRequest();
@@ -134,7 +136,7 @@ class PaymentServiceTest {
         List<Payment> actual = paymentService.getPayments();
         assertEquals(payments, actual);
     }
-    
+
     @Test
     void shouldNotGetAllPayments() throws Exception {
         String errorMessage = "Could not get all payments";
@@ -143,9 +145,18 @@ class PaymentServiceTest {
         catch (Exception exception) { assertEquals(errorMessage, exception.getMessage());}
 
     }
+
     private Payment buildEmptyPayment() {
         Payment payment = new Payment();
         return payment;
+    }
+    private String getPaymentHash(Integer paymentId) {
+        byte[] paymentInBytes = String.valueOf(paymentId).getBytes();
+        String paymentEncoded = Base64.getEncoder().encodeToString(paymentInBytes);
+        return new StringBuilder("http://localhost:8080/")
+                .append("api/payments/")
+                .append(paymentEncoded)
+                .toString();
     }
 
     private Payment buildPaymenyt(List<Product> products, BigDecimal totalPrice) {
