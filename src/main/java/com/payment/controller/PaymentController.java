@@ -62,7 +62,7 @@ public class PaymentController {
 
 	private static String getPaymentString(byte[] paymentInBytes) {
 		return new StringBuilder("http://localhost:8080/")
-				.append("api/v1/payments/")
+				.append("api/payments/")
 				.append(Base64.getEncoder().encodeToString(paymentInBytes))
 				.toString();
 	}
