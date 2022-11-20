@@ -1,10 +1,8 @@
 package com.payment.controller;
 
 import com.payment.controller.reques.PaymentRequest;
-import com.payment.entity.Account;
 import com.payment.entity.Payment;
 import com.payment.entity.Product;
-import com.payment.entity.User;
 import com.payment.exceptions.PaymentException;
 import com.payment.repository.AccountRepository;
 import com.payment.repository.PaymentRepository;
@@ -15,14 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Transactional
